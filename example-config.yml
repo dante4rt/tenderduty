@@ -62,13 +62,13 @@ healthcheck:
 # user-friendly name is recommended.
 chains:
   # The user-friendly name that will be used for labels. Highly suggest wrapping in quotes.
-  "Osmosis":
+  "CrossFi Testnet":
     # chain_id is validated for a match when connecting to an RPC endpoint, also used as a label in several places.
-    chain_id: osmosis-1
+    chain_id: crossfi-evm-testnet-1
     # Hooray, in v2 we derive the valcons from abci queries so you don't have to jump through hoops to figure out how
     # to convert ed25519 keys to the appropriate bech32 address.
     # Use valcons address if using ICS
-    valoper_address: osmovaloper1xxxxxxx...
+    valoper_address: mxvaloper1le0t7w8rw72ph9m29arl8yxauq2n9g36gns6p4
     # Should the monitor revert to using public API endpoints if all supplied RCP nodes fail?
     # This isn't always reliable, not all public nodes have websocket proxying setup correctly.
     public_fallback: no
@@ -129,7 +129,155 @@ chains:
     # Multiple hosts are encouraged, and will be tried sequentially until a working endpoint is discovered.
     nodes:
       # URL for the endpoint. Must include protocol://hostname:port
-      - url: tcp://localhost:26657
+      - url: https://crossfi-testnet-rpc.ramanode.top:443
+        # Should we send an alert if this host isn't responding?
+        alert_if_down: yes
+      # repeat hosts for monitoring redundancy
+      - url: https://some-other-node:443
+        alert_if_down: no
+
+  "CrossFi Mainnet":
+    # chain_id is validated for a match when connecting to an RPC endpoint, also used as a label in several places.
+    chain_id: mineplex-mainnet-1
+    # Hooray, in v2 we derive the valcons from abci queries so you don't have to jump through hoops to figure out how
+    # to convert ed25519 keys to the appropriate bech32 address.
+    # Use valcons address if using ICS
+    valoper_address: mxvaloper1dsw35ycls9v0xx9gm2ljnhqxd5ln2u32sg8auk
+    # Should the monitor revert to using public API endpoints if all supplied RCP nodes fail?
+    # This isn't always reliable, not all public nodes have websocket proxying setup correctly.
+    public_fallback: no
+
+    # Controls various alert settings for each chain.
+    alerts:
+      # If the chain stops seeing new blocks, should an alert be sent?
+      stalled_enabled: yes
+      # How long a halted chain takes in minutes to generate an alarm
+      stalled_minutes: 10
+
+      # Most basic alarm, you just missed x blocks ... would you like to know?
+      consecutive_enabled: yes
+      # How many missed blocks should trigger a notification?
+      consecutive_missed: 5
+      # Consecutive Missed alert Pagerduty Severity
+      consecutive_priority: critical
+
+      # For each chain there is a specific window of blocks and a percentage of missed blocks that will result in
+      # a downtime jail infraction. Should an alert be sent if a certain percentage of this window is exceeded?
+      percentage_enabled: no
+      # What percentage should trigger the alert
+      percentage_missed: 10
+      # Percentage Missed alert Pagerduty Severity
+      percentage_priority: warning
+
+      # Should an alert be sent if the validator is not in the active set ie, jailed,
+      # tombstoned, unbonding?
+      alert_if_inactive: yes
+      # Should an alert be sent if no RPC servers are responding? (Note this alarm is instantaneous with no delay)
+      alert_if_no_servers: yes
+
+      # for this *specific* chain it's possible to override alert settings. If the api_key or webhook addresses are empty,
+      # the global settings will be used. Note, enabled must be set both globally and for each chain.
+
+      # Chain specific setting for pagerduty
+      pagerduty:
+        enabled: yes
+        api_key: "" # uses default if blank
+
+      # Discord settings
+      discord:
+        enabled: yes
+        webhook: "" # uses default if blank
+
+      # Telegram settings
+      telegram:
+        enabled: yes
+        api_key: "" # uses default if blank
+        channel: "" # uses default if blank
+
+      # Slack settings
+      slack:
+        enabled: yes
+        webhook: "" # uses default if blank
+
+    # This section covers our RPC providers. No LCD (aka REST) endpoints are used, only TM's RPC endpoints
+    # Multiple hosts are encouraged, and will be tried sequentially until a working endpoint is discovered.
+    nodes:
+      # URL for the endpoint. Must include protocol://hostname:port
+      - url: https://crossfi-mainnet-rpc.itrocket.net:443
+        # Should we send an alert if this host isn't responding?
+        alert_if_down: yes
+      # repeat hosts for monitoring redundancy
+      - url: https://some-other-node:443
+        alert_if_down: no
+        
+  "Swisstronik Testnet":
+    # chain_id is validated for a match when connecting to an RPC endpoint, also used as a label in several places.
+    chain_id: swisstronik_1291-1
+    # Hooray, in v2 we derive the valcons from abci queries so you don't have to jump through hoops to figure out how
+    # to convert ed25519 keys to the appropriate bech32 address.
+    # Use valcons address if using ICS
+    valoper_address: swtrvaloper14z9hvdv7eadvsccg87ql79zx9ffflhp343l2qt
+    # Should the monitor revert to using public API endpoints if all supplied RCP nodes fail?
+    # This isn't always reliable, not all public nodes have websocket proxying setup correctly.
+    public_fallback: no
+
+    # Controls various alert settings for each chain.
+    alerts:
+      # If the chain stops seeing new blocks, should an alert be sent?
+      stalled_enabled: yes
+      # How long a halted chain takes in minutes to generate an alarm
+      stalled_minutes: 10
+
+      # Most basic alarm, you just missed x blocks ... would you like to know?
+      consecutive_enabled: yes
+      # How many missed blocks should trigger a notification?
+      consecutive_missed: 5
+      # Consecutive Missed alert Pagerduty Severity
+      consecutive_priority: critical
+
+      # For each chain there is a specific window of blocks and a percentage of missed blocks that will result in
+      # a downtime jail infraction. Should an alert be sent if a certain percentage of this window is exceeded?
+      percentage_enabled: no
+      # What percentage should trigger the alert
+      percentage_missed: 10
+      # Percentage Missed alert Pagerduty Severity
+      percentage_priority: warning
+
+      # Should an alert be sent if the validator is not in the active set ie, jailed,
+      # tombstoned, unbonding?
+      alert_if_inactive: yes
+      # Should an alert be sent if no RPC servers are responding? (Note this alarm is instantaneous with no delay)
+      alert_if_no_servers: yes
+
+      # for this *specific* chain it's possible to override alert settings. If the api_key or webhook addresses are empty,
+      # the global settings will be used. Note, enabled must be set both globally and for each chain.
+
+      # Chain specific setting for pagerduty
+      pagerduty:
+        enabled: yes
+        api_key: "" # uses default if blank
+
+      # Discord settings
+      discord:
+        enabled: yes
+        webhook: "" # uses default if blank
+
+      # Telegram settings
+      telegram:
+        enabled: yes
+        api_key: "" # uses default if blank
+        channel: "" # uses default if blank
+
+      # Slack settings
+      slack:
+        enabled: yes
+        webhook: "" # uses default if blank
+
+    # This section covers our RPC providers. No LCD (aka REST) endpoints are used, only TM's RPC endpoints
+    # Multiple hosts are encouraged, and will be tried sequentially until a working endpoint is discovered.
+    nodes:
+      # URL for the endpoint. Must include protocol://hostname:port
+      - url: https://rpc.testnet.swisstronik.com:443
         # Should we send an alert if this host isn't responding?
         alert_if_down: yes
       # repeat hosts for monitoring redundancy
